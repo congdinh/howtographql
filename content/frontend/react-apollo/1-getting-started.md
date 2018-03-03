@@ -166,10 +166,12 @@ input {
 Next, you need to pull in the functionality of Apollo Client (and its React bindings) which comes in several packages:
 
 ```bash(path=".../hackernews-react-apollo")
-yarn add apollo-client-preset react-apollo graphql-tag graphql
+yarn add apollo-client-preset react-apollo@v2.1.0-beta.3 graphql-tag graphql
 ```
 
 </Instruction>
+
+> We're adding `react-apollo@v2.1.0-beta.3`, don't be 😨, something great is coming. With [React Apollo 2.1](https://dev-blog.apollodata.com/whats-next-for-react-apollo-4d41ba12c2cb), we are introducing Query, Mutation and Subscription components, a great way to bring data into your render.
 
 Here's an overview of the packages you just installed:
 
@@ -369,6 +371,8 @@ yarn prisma deploy
 ```
 
 </Instruction>
+
+> If you've installed prisma locally, don't forget to add the following line `/server/node_modules` to your `.gitignore` file.
 
 Note that you can also omit `yarn prisma` in the above command if you have the `prisma` CLI installed globally on your machine (which you can do with `npm install -g prisma`). In that case, you can simply run `prisma deploy`.
 
