@@ -243,3 +243,55 @@ Let's walk through what's happening in this code. As expected, Apollo injected a
 That's it! Go ahead and run `yarn start` again. You should see the exact same screen as before.
 
 > **Note**: If the browser on `http://localhost:4000` only says error and is empty otherwise, you probably forgot to have your server running. Note that for the app to work the server needs to run as well - so you have two running processes in your terminal: One for the server and one for the React app. To start the server, navigate into the `server` directory and run `yarn start`.
+
+### Migrating to React Apollo v2.1
+
+EXPLANATION !!!!
+
+<Instruction>
+
+Open `LinkList.js` in the `components` directory and change `render` to looks as follows:
+
+```js(path=".../hackernews-react-apollo/src/components/LinkList.js")
+render() {
+  return (
+    <Query query={FEED_QUERY}>
+      {(result) => {
+        if (result.loading) return <div>Loading</div>;
+        if (result.error) return <div>Error</div>;
+        
+        const { data } = result;
+        const linksToRender = data.feed.links;
+        
+        return <div>{linksToRender.map(link => <Link key={link.id} link={link} />)}</div>;
+      }}
+    </Query>
+  )
+}
+```
+
+</Instruction>
+
+EXPLANATION !!!!
+
+<Instruction>
+
+Next, you need to replace the `react-apollo` dependency. Import `Query` component on the top of `LinkList.js`:
+
+```js(path=".../hackernews-react-apollo/src/components/LinkList.js")
+import { Query } from 'react-apollo'
+```
+
+</Instruction>
+
+EXPLANATION !!!!
+
+<Instruction>
+
+To finish it up, you need to remove the graphql HOC. Change the following line on the bottom of `LinkList.js`:
+
+```js(path=".../hackernews-react-apollo/src/components/LinkList.js")
+export default LinkList; 
+```
+
+</Instruction>
