@@ -45,14 +45,12 @@ Next, make sure your `ApolloClient` instance knows about the subscription server
 Open `index.js` and add the following import to the top of the file:
 
 ```js(path=".../hackernews-react-apollo/src/index.js")
-import { ApolloLink, split } from 'apollo-client-preset'
+import { split } from 'apollo-link'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
 ```
 
 </Instruction>
-
-Notice that you're now also importing the `split` function from 'apollo-client-preset'.
 
 <Instruction>
 
@@ -64,7 +62,7 @@ const wsLink = new WebSocketLink({
   options: {
     reconnect: true,
     connectionParams: {
-      authToken: localStorage.getItem(AUTH_TOKEN),
+      authToken: localStorage.getItem(AUTH_TOKEN)
     }
   }
 })
@@ -75,7 +73,7 @@ const link = split(
     return kind === 'OperationDefinition' && operation === 'subscription'
   },
   wsLink,
-  httpLinkWithAuthToken,
+  authLink.concat(httpLink)
 )
 
 const client = new ApolloClient({
@@ -90,7 +88,7 @@ You're instantiating a `WebSocketLink` that knows the subscriptions endpoint. Th
 
 [`split`](https://github.com/apollographql/apollo-link/blob/98eeb1deb0363384f291822b6c18cdc2c97e5bdb/packages/apollo-link/src/link.ts#L33) is used to "route" a request to a specific middleware link. It takes three arguments, the first one is a `test` function which returns a boolean. The remaining two arguments are again of type `ApolloLink`. If `test` returns `true`, the request will be forwarded to the link passed as the second argument. If `false`, to the third one.
 
-In your case, the `test` function is checking whether the requested operation is a _subscription_. If this is the case, it will be forwarded to the `wsLink`, otherwise (if it's a _query_ or _mutation_), the `httpLinkWithAuthToken` will take care of it:
+In your case, the `test` function is checking whether the requested operation is a _subscription_. If this is the case, it will be forwarded to the `wsLink`, otherwise (if it's a _query_ or _mutation_), the `authLink` will take care of it:
 
 ![](https://cdn-images-1.medium.com/max/720/1*KwnMO21k0d3UbyKWnlbeJg.png)
 *Picture taken from [Apollo Link: The modular GraphQL network stack](https://dev-blog.apollodata.com/apollo-link-the-modular-graphql-network-stack-3b6d5fcf9244) by [Evans Hauser](https://twitter.com/EvansHauser)*

@@ -18,26 +18,24 @@ Once more, you first need to prepare the React components for this new functiona
 
 <Instruction>
 
-Open `App.js` and adjust the render method like so:
+Open `App.js` and adjust `export` like so:
 
-```js{4,8,9}(path=".../hackernews-react-apollo/src/components/App.js")
-render() {
-  return (
-    <div className='center w85'>
-      <Header />
-      <div className='ph3 pv1 background-gray'>
-        <Switch>
-          <Route exact path='/' render={() => <Redirect to='/new/1' />} />
-          <Route exact path='/login' component={Login} />
-          <Route exact path='/create' component={CreateLink} />
-          <Route exact path='/search' component={Search} />
-          <Route exact path='/top' component={LinkList} />
-          <Route exact path='/new/:page' component={LinkList} />
-        </Switch>
-      </div>
+```js{6,10,11}(path=".../hackernews-react-apollo/src/components/App.js")
+export default () => (
+  <div className="center w85">
+    <Header />
+    <div className="ph3 pv1 background-gray">
+      <Switch>
+        <Route exact path="/" render={() => <Redirect to="/new/1" />} />
+        <Route exact path="/create" component={CreateLink} />
+        <Route exact path="/login" component={Login} />
+        <Route exact path="/search" component={Search} />
+        <Route exact path="/top" component={LinkList} />
+        <Route exact path="/new/:page" component={LinkList} />
+      </Switch>
     </div>
-  )
-}
+  </div>
+)
 ```
 
 </Instruction>
@@ -77,13 +75,12 @@ You also need to add quite some logic to the `LinkList` component to account for
 
 <Instruction>
 
-Open `LinkList.js` and add three arguments to the `FeedQuery` by replacing the `FEED_QUERY` definition with the following:
+Open `LinkList.js` and add three arguments to the `FeedQuery` and `count` field by replacing the `FEED_QUERY` definition with the following:
 
-```js(path=".../hackernews-react-apollo/src/components/LinkList.js")
+```js{2-3,20}(path=".../hackernews-react-apollo/src/components/LinkList.js")
 export const FEED_QUERY = gql`
   query FeedQuery($first: Int, $skip: Int, $orderBy: LinkOrderByInput) {
     feed(first: $first, skip: $skip, orderBy: $orderBy) {
-      count
       links {
         id
         createdAt
@@ -117,19 +114,15 @@ But how can we pass the variables when using the `graphql` container which is fe
 Still in `LinkList.js`, replace the current `export` statement with the following:
 
 ```js(path=".../hackernews-react-apollo/src/components/LinkList.js")
-export default graphql(FEED_QUERY, {
-  name: 'feedQuery',
-  options: ownProps => {
-    const page = parseInt(ownProps.match.params.page, 10)
-    const isNewPage = ownProps.location.pathname.includes('new')
-    const skip = isNewPage ? (page - 1) * LINKS_PER_PAGE : 0
-    const first = isNewPage ? LINKS_PER_PAGE : 100
-    const orderBy = isNewPage ? 'createdAt_DESC' : null
-    return {
-      variables: { first, skip, orderBy },
-    }
-  },
-})(LinkList)
+const getQueryVariables = props => {
+  const isNewPage = props.location.pathname.includes('new')
+  const page = parseInt(props.match.params.page, 10)
+
+  const skip = isNewPage ? (page - 1) * LINKS_PER_PAGE : 0
+  const first = isNewPage ? LINKS_PER_PAGE : 100
+  const orderBy = isNewPage ? 'createdAt_DESC' : null
+  return { first, skip, orderBy }
+}
 ```
 
 </Instruction>
